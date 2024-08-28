@@ -1,7 +1,6 @@
-package dev.ElifnazArc.MT940_to_Excel.Controller;
+package dev.ElifnazArc.MT940_to_Excel.controller;
 
-import dev.ElifnazArc.MT940_to_Excel.Service.MT940ParseService;
-import org.springframework.beans.factory.annotation.Autowired;
+import dev.ElifnazArc.MT940_to_Excel.service.MT940ParseService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,9 +11,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 public class FileParseController {
+    private final MT940ParseService mt940Service;
 
-    @Autowired
-    private MT940ParseService mt940Service;
+    public FileParseController(MT940ParseService mt940Service) {
+        this.mt940Service = mt940Service;
+    }
 
     @GetMapping("/parse-file")
     public List<String> parseFile() {

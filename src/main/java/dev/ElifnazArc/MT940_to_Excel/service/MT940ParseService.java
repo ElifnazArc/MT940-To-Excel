@@ -1,4 +1,4 @@
-package dev.ElifnazArc.MT940_to_Excel.Service;
+package dev.ElifnazArc.MT940_to_Excel.service;
 
 import com.prowidesoftware.swift.model.field.*;
 import com.prowidesoftware.swift.model.mt.mt9xx.MT940;
@@ -44,17 +44,21 @@ public class MT940ParseService {
         result.put("Bank Code", bankCode);
 
         // Transaction Reference Number (Field 20)
-        result.put("Transaction Reference Number", mt.getField20().getValue());
+        Field20 field20 = mt.getField20();
+        result.put("Transaction Reference Number", field20 != null ? field20.getValue() : "N/A");
 
         // Account Identification (Field 25)
-        result.put("Account Identification", mt.getField25().getValue());
+        Field25 field25 = mt.getField25();
+        result.put("Account Identification", field25 != null ? field25.getValue() : "N/A");
 
         // Statement Number (Field 28C)
-        result.put("Statement Number", mt.getField28C().getValue());
+        Field28C field28C = mt.getField28C();
+        result.put("Statement Number", field28C != null ? field28C.getValue() : "N/A");
 
         // Opening Balance (Field 60F)
         Field60F openingBalance = mt.getField60F();
-        result.put("Opening Balance", openingBalance.getValue());
+        result.put("Opening Balance", openingBalance != null ? openingBalance.getValue() : "N/A");
+
 
         // Transactions (Field 61) and Transaction Details (Field 86)
         List<Map<String, String>> transactions = new ArrayList<>();
@@ -64,17 +68,18 @@ public class MT940ParseService {
         for (int i = 0; i < field61s.size(); i++) {
             Map<String, String> transactionDetails = new HashMap<>();
             Field61 transaction = field61s.get(i);
-            transactionDetails.put("Transaction Date", transaction.getComponent(Field61.VALUE_DATE));
-            transactionDetails.put("Transaction Amount", transaction.getComponent(Field61.AMOUNT));
-            transactionDetails.put("Transaction Type", transaction.getComponent(Field61.DC_MARK));
-            transactionDetails.put("Transaction Details", i < field86s.size() ? field86s.get(i).getNarrative() : "N/A");
+            transactionDetails.put("Date", transaction.getComponent(Field61.VALUE_DATE));
+            transactionDetails.put("Amount", transaction.getComponent(Field61.AMOUNT));
+            transactionDetails.put("Type", transaction.getComponent(Field61.DC_MARK));
+            transactionDetails.put("Details", i < field86s.size() ? field86s.get(i).getNarrative() : "N/A");
 
             transactions.add(transactionDetails);
         }
         result.put("Transactions", transactions);
 
         // Closing Balance (Field 62F)
-        result.put("Closing Balance", mt.getField62F().getValue());
+        Field62F closingBalance = mt.getField62F();
+        result.put("Closing Balance", closingBalance != null ? closingBalance.getValue() : "N/A");
 
         // Closing Available Balance (Field 64)
         Field64 closingAvailableBalance = mt.getField64();
