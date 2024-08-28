@@ -2,6 +2,7 @@ package dev.ElifnazArc.MT940_to_Excel.service;
 
 import com.prowidesoftware.swift.model.field.*;
 import com.prowidesoftware.swift.model.mt.mt9xx.MT940;
+import dev.ElifnazArc.MT940_to_Excel.entity.Transaction;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -34,12 +35,15 @@ public class MT940ParseService {
         // Dosya içeriğini birleştirerek tek bir string haline getir
         String msg = String.join("\n", fileContent);
 
+        Transaction transaction = new Transaction();
+
         // MT940 formatını parse et
         MT940 mt = MT940.parse(msg);
         Map<String, Object> result = new HashMap<>();
 
         // Banka Kodu (BIC)
         String sender = mt.getSender();
+
         String bankCode = sender != null ? sender.substring(1, 5) : "N/A";
         result.put("Bank Code", bankCode);
 
@@ -67,10 +71,10 @@ public class MT940ParseService {
 
         for (int i = 0; i < field61s.size(); i++) {
             Map<String, String> transactionDetails = new HashMap<>();
-            Field61 transaction = field61s.get(i);
-            transactionDetails.put("Date", transaction.getComponent(Field61.VALUE_DATE));
-            transactionDetails.put("Amount", transaction.getComponent(Field61.AMOUNT));
-            transactionDetails.put("Type", transaction.getComponent(Field61.DC_MARK));
+            Field61 transac = field61s.get(i);
+            transactionDetails.put("Date", transac.getComponent(Field61.VALUE_DATE));
+            transactionDetails.put("Amount", transac.getComponent(Field61.AMOUNT));
+            transactionDetails.put("Type", transac.getComponent(Field61.DC_MARK));
             transactionDetails.put("Details", i < field86s.size() ? field86s.get(i).getNarrative() : "N/A");
 
             transactions.add(transactionDetails);

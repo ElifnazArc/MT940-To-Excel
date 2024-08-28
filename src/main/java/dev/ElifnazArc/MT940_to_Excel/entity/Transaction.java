@@ -1,121 +1,55 @@
 package dev.ElifnazArc.MT940_to_Excel.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "transactions")
 public class Transaction {
-
     @Id
-    private String transactionReferenceNumber;
-    private String bankCode;
+    @Column(name = "id", nullable = false)
+    private Integer id;
+
+    @Column(name = "account_identification")
     private String accountIdentification;
-    private String statementNumber;
-    private String openingBalance;
-    private String transactionDate;
-    private String transactionAmount;
-    private String transactionType;
-    private String transactionDetails;
-    private String closingBalance;
+
+    @Column(name = "bank_code")
+    private String bankCode;
+
+    @Column(name = "closing_available_balance")
     private String closingAvailableBalance;
+
+    @Column(name = "closing_balance")
+    private String closingBalance;
+
+    @Column(name = "forward_available_balance")
     private String forwardAvailableBalance;
 
-    // Getters and Setters
-    public String getTransactionReferenceNumber() {
-        return transactionReferenceNumber;
-    }
+    @Column(name = "opening_balance")
+    private String openingBalance;
 
-    public void setTransactionReferenceNumber(String transactionReferenceNumber) {
-        this.transactionReferenceNumber = transactionReferenceNumber;
-    }
+    @Column(name = "statement_number")
+    private String statementNumber;
 
-    public String getBankCode() {
-        return bankCode;
-    }
+    @Column(name = "transaction_amount")
+    private String transactionAmount;
 
-    public void setBankCode(String bankCode) {
-        this.bankCode = bankCode;
-    }
+    @Column(name = "transaction_date")
+    private String transactionDate;
 
-    public String getAccountIdentification() {
-        return accountIdentification;
-    }
+    @Column(name = "transaction_details")
+    private String transactionDetails;
 
-    public void setAccountIdentification(String accountIdentification) {
-        this.accountIdentification = accountIdentification;
-    }
+    @Column(name = "transaction_reference_number", nullable = false)
+    private String transactionReferenceNumber;
 
-    public String getStatementNumber() {
-        return statementNumber;
-    }
+    @Column(name = "transaction_type")
+    private String transactionType;
 
-    public void setStatementNumber(String statementNumber) {
-        this.statementNumber = statementNumber;
-    }
-
-    public String getOpeningBalance() {
-        return openingBalance;
-    }
-
-    public void setOpeningBalance(String openingBalance) {
-        this.openingBalance = openingBalance;
-    }
-
-    public String getTransactionDate() {
-        return transactionDate;
-    }
-
-    public void setTransactionDate(String transactionDate) {
-        this.transactionDate = transactionDate;
-    }
-
-    public String getTransactionAmount() {
-        return transactionAmount;
-    }
-
-    public void setTransactionAmount(String transactionAmount) {
-        this.transactionAmount = transactionAmount;
-    }
-
-    public String getTransactionType() {
-        return transactionType;
-    }
-
-    public void setTransactionType(String transactionType) {
-        this.transactionType = transactionType;
-    }
-
-    public String getTransactionDetails() {
-        return transactionDetails;
-    }
-
-    public void setTransactionDetails(String transactionDetails) {
-        this.transactionDetails = transactionDetails;
-    }
-
-    public String getClosingBalance() {
-        return closingBalance;
-    }
-
-    public void setClosingBalance(String closingBalance) {
-        this.closingBalance = closingBalance;
-    }
-
-    public String getClosingAvailableBalance() {
-        return closingAvailableBalance;
-    }
-
-    public void setClosingAvailableBalance(String closingAvailableBalance) {
-        this.closingAvailableBalance = closingAvailableBalance;
-    }
-
-    public String getForwardAvailableBalance() {
-        return forwardAvailableBalance;
-    }
-
-    public void setForwardAvailableBalance(String forwardAvailableBalance) {
-        this.forwardAvailableBalance = forwardAvailableBalance;
-    }
 }
