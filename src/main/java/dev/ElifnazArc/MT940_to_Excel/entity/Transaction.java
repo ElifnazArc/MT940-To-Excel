@@ -1,11 +1,11 @@
 package dev.ElifnazArc.MT940_to_Excel.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -13,35 +13,36 @@ import lombok.Setter;
 @Table(name = "transactions")
 public class Transaction {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "account_identification")
+    @Column(name = "account_identification", nullable = false, length = 50)
     private String accountIdentification;
 
-    @Column(name = "bank_code")
+    @Column(name = "bank_code", nullable = false, length = 20)
     private String bankCode;
 
     @Column(name = "closing_available_balance")
     private String closingAvailableBalance;
 
-    @Column(name = "closing_balance")
-    private String closingBalance;
+    @Column(name = "closing_balance", nullable = false, precision = 15, scale = 2)
+    private BigDecimal closingBalance;
 
     @Column(name = "forward_available_balance")
     private String forwardAvailableBalance;
 
-    @Column(name = "opening_balance")
-    private String openingBalance;
+    @Column(name = "opening_balance", nullable = false, precision = 15, scale = 2)
+    private BigDecimal openingBalance;
 
-    @Column(name = "statement_number")
+    @Column(name = "statement_number", nullable = false, length = 10)
     private String statementNumber;
 
-    @Column(name = "transaction_amount")
-    private String transactionAmount;
+    @Column(name = "transaction_amount", nullable = false, precision = 15, scale = 2)
+    private BigDecimal transactionAmount;
 
-    @Column(name = "transaction_date")
-    private String transactionDate;
+    @Column(name = "transaction_date", nullable = false)
+    private LocalDate transactionDate;
 
     @Column(name = "transaction_details")
     private String transactionDetails;
@@ -49,7 +50,29 @@ public class Transaction {
     @Column(name = "transaction_reference_number", nullable = false)
     private String transactionReferenceNumber;
 
-    @Column(name = "transaction_type")
-    private String transactionType;
+    @Column(name = "transaction_type", nullable = false)
+    private Character transactionType;
 
+    @Column(name = "sender", nullable = false, length = 50)
+    private String sender;
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", accountIdentification='" + accountIdentification + '\'' +
+                ", bankCode='" + bankCode + '\'' +
+                ", closingAvailableBalance='" + closingAvailableBalance + '\'' +
+                ", closingBalance=" + closingBalance +
+                ", forwardAvailableBalance='" + forwardAvailableBalance + '\'' +
+                ", openingBalance=" + openingBalance +
+                ", statementNumber='" + statementNumber + '\'' +
+                ", transactionAmount=" + transactionAmount +
+                ", transactionDate=" + transactionDate +
+                ", transactionDetails='" + transactionDetails + '\'' +
+                ", transactionReferenceNumber='" + transactionReferenceNumber + '\'' +
+                ", transactionType=" + transactionType +
+                ", sender='" + sender + '\'' +
+                '}';
+    }
 }
