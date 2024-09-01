@@ -47,7 +47,7 @@ public class Transaction {
     @Column(name = "transaction_details")
     private String transactionDetails;
 
-    @Column(name = "transaction_reference_number", nullable = false)
+    @Column(name = "transaction_reference_number")
     private String transactionReferenceNumber;
 
     @Column(name = "transaction_type", nullable = false)
@@ -56,23 +56,4 @@ public class Transaction {
     @Column(name = "sender", nullable = false, length = 50)
     private String sender;
 
-    @Override
-    public String toString() {
-        return "Transaction{" +
-                "id=" + id +
-                ", accountIdentification='" + accountIdentification + '\'' +
-                ", bankCode='" + bankCode + '\'' +
-                ", closingAvailableBalance='" + closingAvailableBalance + '\'' +
-                ", closingBalance=" + closingBalance +
-                ", forwardAvailableBalance='" + forwardAvailableBalance + '\'' +
-                ", openingBalance=" + openingBalance +
-                ", statementNumber='" + statementNumber + '\'' +
-                ", transactionAmount=" + transactionAmount +
-                ", transactionDate=" + transactionDate +
-                ", transactionDetails='" + transactionDetails + '\'' +
-                ", transactionReferenceNumber='" + transactionReferenceNumber + '\'' +
-                ", transactionType=" + transactionType +
-                ", sender='" + sender + '\'' +
-                '}';
-    }
 }

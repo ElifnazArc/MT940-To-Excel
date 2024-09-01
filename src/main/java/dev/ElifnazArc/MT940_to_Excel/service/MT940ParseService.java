@@ -40,107 +40,102 @@ public class MT940ParseService {
     }
 
     // MT940 dosyasını parse edip bir Map yapısında döndürür
-    public void parseMT940ToRead(List<String> fileContent) {
+    public List<Transaction> parseMT940ToRead(List<String> fileContent) {
         // Dosya içeriğini birleştirerek tek bir string haline getir
         String msg = String.join("\n", fileContent);
 
-        Transaction transaction = new Transaction();
+        List<Transaction> transactions = new ArrayList<>();
 
         // MT940 formatını parse et
         MT940 mt = MT940.parse(msg);
-        Map<String, Object> result = new HashMap<>();
 
-        // Banka Kodu (BIC) --------------------------------
-        String sender = mt.getSender();
-        System.out.println("Sender: " + sender);
-        transaction.setSender(sender);
-
-        String bankCode = sender != null ? sender.substring(1, 5) : "N/A";
-        result.put("Bank Code", bankCode);
-        transaction.setBankCode(bankCode);
-
-        // Transaction Reference Number (Field 20) ---------------------------
-        Field20 field20 = mt.getField20();
-        result.put("Transaction Reference Number", field20 != null ? field20.getValue() : "N/A");
-        transaction.setTransactionReferenceNumber(field20 != null ? field20.getValue() : "N/A");
-
-        // Account Identification (Field 25) ------------------------------
-        Field25 field25 = mt.getField25();
-        result.put("Account Identification", field25 != null ? field25.getValue() : "N/A");
-        if (field25 != null) {
-            transaction.setAccountIdentification(field25.getValue());
-        }
-
-        // Statement Number (Field 28C) -------------------------------
-        Field28C field28C = mt.getField28C();
-        result.put("Statement Number", field28C != null ? field28C.getValue() : "N/A");
-        transaction.setStatementNumber(field28C != null ? field28C.getValue() : "N/A");
-
-        // Opening Balance (Field 60F)
-        Field60F field60F = mt.getField60F();
-        result.put("Opening Balance", field60F != null ? field60F.getValue() : "N/A");
-        BigDecimal openingBalance = null;
-        if (field60F != null) {
-            openingBalance = new BigDecimal(field60F.getAmount().replace(',', '.'));
-        }
-        transaction.setOpeningBalance(openingBalance);
 
         // Transactions (Field 61) and Transaction Details (Field 86)
-        List<Map<String, String>> transactions = new ArrayList<>();
         List<Field61> field61s = mt.getField61();
         List<Field86> field86s = mt.getField86();
 
         for (int i = 0; i < field61s.size(); i++) {
-            Map<String, String> transactionDetails = new HashMap<>();
+
+            Transaction transaction = new Transaction();
             Field61 field61 = field61s.get(i);
 
             LocalDate transactionDate = parseYYMMDD(field61.getValueDate());
-            transactionDetails.put("Date", field61.getComponent(Field61.VALUE_DATE));
             transaction.setTransactionDate(transactionDate);
 
-            transactionDetails.put("Amount", field61.getComponent(Field61.AMOUNT));
-            transaction.setTransactionAmount(new BigDecimal(field61.getAmount().replace(',','.')));
+            transaction.setTransactionAmount(new BigDecimal(field61.getAmount().replace(',', '.')));
 
-            transactionDetails.put("Type", field61.getComponent(Field61.DEBITCREDIT_MARK));
             String dcMark = field61.getDebitCreditMark();
+            transaction.setTransactionType(dcMark != null && !dcMark.isEmpty() ? dcMark.charAt(0) : 'N');
 
-            transaction.setTransactionType(dcMark != null && !dcMark.isEmpty() ? dcMark.charAt(0) : 'N'); // 'N' bir varsayılan değer
-            transactionDetails.put("Details", i < field86s.size() ? field86s.get(i).getNarrative() : "N/A");
             transaction.setTransactionDetails(i < field86s.size() ? field86s.get(i).getNarrative() : "N/A");
 
-            transactions.add(transactionDetails);
-        }
-        result.put("Transactions", transactions);
 
-        // Closing Balance (Field 62F) -------------------------------------
-        Field62F field62F = mt.getField62F();
-        result.put("Closing Balance", field62F != null ? field62F.getValue() : "N/A");
-        BigDecimal closingBalance = null;
-        if (field62F != null) {
-            closingBalance = new BigDecimal(field62F.getAmount().replace(',', '.'));
-        }
-        transaction.setClosingBalance(closingBalance);
+            // Banka Kodu (BIC) --------------------------------
+            String sender = mt.getSender();
+            //System.out.println("Sender: " + sender);
+            transaction.setSender(sender);
 
-        // Closing Available Balance (Field 64) ----------------------------------
-        Field64 closingAvailableBalance = mt.getField64();
-        result.put("Closing Available Balance", closingAvailableBalance != null ? closingAvailableBalance.getValue() : "N/A");
-        if (closingAvailableBalance != null) {
-            transaction.setClosingAvailableBalance(String.valueOf(new BigDecimal(closingAvailableBalance.getAmount().replace(',','.'))));
-        }
 
-        // Forward Available Balance (Field 65) ------------------------------
-        List<Field65> forwardAvailableBalances = mt.getField65();
-        List<String> forwardBalances = new ArrayList<>();
-        if (forwardAvailableBalances != null && !forwardAvailableBalances.isEmpty()) {
-            for (Field65 forwardAvailableBalance : forwardAvailableBalances) {
-                forwardBalances.add(forwardAvailableBalance.getValue());
+            String bankCode = sender != null ? sender.substring(1, 5) : "N/A";
+            transaction.setBankCode(bankCode);
+
+
+            // Transaction Reference Number (Field 20) ---------------------------
+            Field20 field20 = mt.getField20();
+            transaction.setTransactionReferenceNumber(field20 != null ? field20.getValue() : "N/A");
+
+
+            // Account Identification (Field 25) ------------------------------
+            Field25 field25 = mt.getField25();
+            if (field25 != null) {
+                transaction.setAccountIdentification(field25.getValue());
             }
-        }
-        result.put("Forward Available Balance", forwardBalances.isEmpty() ? "N/A" : forwardBalances);
-        transaction.setForwardAvailableBalance(forwardBalances.isEmpty() ? null : String.join(", ", forwardBalances));
 
-        System.out.println(transaction);
-        transactionRepository.save(transaction);
+
+            // Statement Number (Field 28C) -------------------------------
+            Field28C field28C = mt.getField28C();
+            transaction.setStatementNumber(field28C != null ? field28C.getValue() : "N/A");
+
+
+            // Opening Balance (Field 60F) -------------------------------------
+            Field60F field60F = mt.getField60F();
+            BigDecimal openingBalance = null;
+            if (field60F != null) {
+                openingBalance = new BigDecimal(field60F.getAmount().replace(',', '.'));
+            }
+            transaction.setOpeningBalance(openingBalance);
+
+
+            // Closing Balance (Field 62F) -------------------------------------
+            Field62F field62F = mt.getField62F();
+            BigDecimal closingBalance = null;
+            if (field62F != null) {
+                closingBalance = new BigDecimal(field62F.getAmount().replace(',', '.'));
+            }
+            transaction.setClosingBalance(closingBalance);
+
+            // Closing Available Balance (Field 64) ----------------------------------
+            Field64 closingAvailableBalance = mt.getField64();
+            if (closingAvailableBalance != null) {
+                transaction.setClosingAvailableBalance(String.valueOf(new BigDecimal(closingAvailableBalance.getAmount().replace(',', '.'))));
+            }
+
+            // Forward Available Balance (Field 65) ------------------------------
+            List<Field65> forwardAvailableBalances = mt.getField65();
+            List<String> forwardBalances = new ArrayList<>();
+            if (forwardAvailableBalances != null && !forwardAvailableBalances.isEmpty()) {
+                for (Field65 forwardAvailableBalance : forwardAvailableBalances) {
+                    forwardBalances.add(forwardAvailableBalance.getValue());
+                }
+            }
+            transaction.setForwardAvailableBalance(forwardBalances.isEmpty() ? null : String.join(", ", forwardBalances));
+
+            System.out.println(transaction);
+            transactions.add(transaction);
+
+        }
+        transactionRepository.saveAll(transactions);
+        return transactions;
     }
 
     LocalDate parseYYMMDD(String dateStr) {
@@ -158,4 +153,5 @@ public class MT940ParseService {
 
         return date;
     }
+
 }

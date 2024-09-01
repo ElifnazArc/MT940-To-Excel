@@ -21,13 +21,13 @@ public class FileParseController {
 
     @GetMapping("/parse-file")
     public List<String> parseFile() {
-        return mt940Service.getResourceFileAsString("mt940-1.txt");
+        return mt940Service.getResourceFileAsString("mt940-npp.txt");
     }
 
     @GetMapping("/parse-mt940")
     public List<Transaction> parseMT940() {
         // Dosya içeriğini al ve parse et
-        List<String> fileContent = mt940Service.getResourceFileAsString("mt940-1.txt");
+        List<String> fileContent = mt940Service.getResourceFileAsString("mt940-npp.txt");
         mt940Service.parseMT940ToRead(fileContent);
 
         return transactionRepository.findAll();
