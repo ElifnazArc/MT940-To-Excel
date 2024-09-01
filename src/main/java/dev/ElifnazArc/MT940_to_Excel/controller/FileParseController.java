@@ -6,9 +6,7 @@ import dev.ElifnazArc.MT940_to_Excel.service.MT940ParseService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -23,15 +21,20 @@ public class FileParseController {
 
     @GetMapping("/parse-file")
     public List<String> parseFile() {
-        return mt940Service.getResourceFileAsString("mt940-npp.txt");
+        return mt940Service.getResourceFileAsString("mt940-1.txt");
     }
 
     @GetMapping("/parse-mt940")
     public List<Transaction> parseMT940() {
         // Dosya içeriğini al ve parse et
-        List<String> fileContent = mt940Service.getResourceFileAsString("mt940-npp.txt");
+        List<String> fileContent = mt940Service.getResourceFileAsString("mt940-1.txt");
         mt940Service.parseMT940ToRead(fileContent);
 
+        return transactionRepository.findAll();
+    }
+
+    @GetMapping("/see-all-list")
+    public List<Transaction> seeAllTransactions() {
         return transactionRepository.findAll();
     }
 }
