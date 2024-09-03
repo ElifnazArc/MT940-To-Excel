@@ -56,4 +56,7 @@ public class Transaction {
     @Column(name = "sender", nullable = false, length = 50)
     private String sender;
 
+    @Column(name = "batch_id", nullable = false, length = 50)
+    private String batchId;
+
 }
