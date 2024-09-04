@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/transactions")
-public class ExcelController {
+public class ExportController {
 
     @Autowired
     private TransactionRepository transactionRepository;

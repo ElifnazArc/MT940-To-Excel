@@ -11,12 +11,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-public class FileParseController {
+public class MT940ParseController {
     private final MT940ParseService mt940Service;
     private final TransactionRepository transactionRepository;
     private final TransactionService transactionService;
 
-    public FileParseController(MT940ParseService mt940Service, TransactionRepository transactionRepository, TransactionService transactionService) {
+    public MT940ParseController(MT940ParseService mt940Service, TransactionRepository transactionRepository, TransactionService transactionService) {
         this.mt940Service = mt940Service;
         this.transactionRepository = transactionRepository;
         this.transactionService = transactionService;
@@ -24,13 +24,13 @@ public class FileParseController {
 
     @GetMapping("/parse-file")
     public List<String> parseFile() {
-        return mt940Service.getResourceFileAsString("mt940-2.txt");
+        return mt940Service.getResourceFileAsString("mt940-npp.txt");
     }
 
     @GetMapping("/parse-mt940")
     public List<Transaction> parseMT940() {
         // Dosya içeriğini al ve parse et
-        List<String> fileContent = mt940Service.getResourceFileAsString("mt940-2.txt");
+        List<String> fileContent = mt940Service.getResourceFileAsString("mt940-npp.txt");
         transactionService.parseMT940ToRead(fileContent);
 
         return transactionRepository.findAll();
