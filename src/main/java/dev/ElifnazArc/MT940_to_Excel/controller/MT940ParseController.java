@@ -36,8 +36,9 @@ public class MT940ParseController {
         return transactionRepository.findAll();
     }
 
-    @GetMapping("/see-all-list")
-    public List<Transaction> seeAllTransactions() {
+    @GetMapping("/transactions/show")
+    public List<Transaction> getAllTransactions() {
         return transactionRepository.findAll();
     }
+
 }

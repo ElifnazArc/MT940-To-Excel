@@ -7,11 +7,3 @@ public interface TransactionRepository extends ListCrudRepository<Transaction, I
 }
 
 
-
-
-
-
-
-
-
-

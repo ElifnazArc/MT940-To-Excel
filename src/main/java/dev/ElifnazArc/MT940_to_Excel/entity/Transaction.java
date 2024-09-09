@@ -29,11 +29,17 @@ public class Transaction {
     @Column(name = "closing_balance", nullable = false, precision = 15, scale = 2)
     private BigDecimal closingBalance;
 
+    @Column(name = "closing_currency", nullable = false, length = 10)
+    private String closingCurrency;
+
     @Column(name = "forward_available_balance")
     private String forwardAvailableBalance;
 
     @Column(name = "opening_balance", nullable = false, precision = 15, scale = 2)
     private BigDecimal openingBalance;
+
+    @Column(name = "opening_currency", nullable = false, length = 10)
+    private String openingCurrency;
 
     @Column(name = "statement_number", nullable = false, length = 10)
     private String statementNumber;

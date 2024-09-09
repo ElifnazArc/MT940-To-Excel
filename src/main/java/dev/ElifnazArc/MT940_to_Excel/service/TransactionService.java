@@ -24,26 +24,23 @@ public class TransactionService {
 
     // MT940 dosyasını parse edip bir Map yapısında döndürür
     public List<Transaction> parseMT940ToRead(List<String> fileContent) {
-        // Dosya içeriğini birleştirerek tek bir string haline getir
         String msg = String.join("\n", fileContent);
 
         List<Transaction> transactions = new ArrayList<>();
 
-        // MT940 formatını parse et
         MT940 mt = MT940.parse(msg);
 
-        // Generate a single GUID for all transactions in this MT940 file
+        // Batch ID tüm işlemler için
         String batchId = UUID.randomUUID().toString();
 
-        // Transactions (Field 61) and Transaction Details (Field 86)
         List<Field61> field61s = mt.getField61();
         List<Field86> field86s = mt.getField86();
 
+        // Currency bilgisi Field 60F veya 62F'ten alınabilir
+        String currency = mt.getField60F() != null ? mt.getField60F().getCurrency() : "N/A";
+
         for (int i = 0; i < field61s.size(); i++) {
-
             Transaction transaction = new Transaction();
-            // Generate and set GUID for each transaction
-
             transaction.setBatchId(batchId);
 
             Field61 field61 = field61s.get(i);
@@ -58,28 +55,28 @@ public class TransactionService {
 
             transaction.setTransactionDetails(i < field86s.size() ? field86s.get(i).getNarrative() : "N/A");
 
-            // Banka Kodu (BIC) --------------------------------
+            // Banka Kodu (BIC)
             String sender = mt.getSender();
             transaction.setSender(sender);
 
             String bankCode = sender != null ? sender.substring(1, 5) : "N/A";
             transaction.setBankCode(bankCode);
 
-            // Transaction Reference Number (Field 20) ---------------------------
+            // Transaction Reference Number (Field 20)
             Field20 field20 = mt.getField20();
             transaction.setTransactionReferenceNumber(field20 != null ? field20.getValue() : "N/A");
 
-            // Account Identification (Field 25) ------------------------------
+            // Account Identification (Field 25)
             Field25 field25 = mt.getField25();
             if (field25 != null) {
                 transaction.setAccountIdentification(field25.getValue());
             }
 
-            // Statement Number (Field 28C) -------------------------------
+            // Statement Number (Field 28C)
             Field28C field28C = mt.getField28C();
             transaction.setStatementNumber(field28C != null ? field28C.getValue() : "N/A");
 
-            // Opening Balance (Field 60F) -------------------------------------
+            // Opening Balance (Field 60F)
             Field60F field60F = mt.getField60F();
             BigDecimal openingBalance = null;
             if (field60F != null) {
@@ -87,7 +84,11 @@ public class TransactionService {
             }
             transaction.setOpeningBalance(openingBalance);
 
-            // Closing Balance (Field 62F) -------------------------------------
+            // Opening Currency (Field 60F)
+            String openingCurrency = field60F != null ? field60F.getCurrency() : "N/A";
+            transaction.setOpeningCurrency(openingCurrency); // Make sure your entity has this field
+
+            // Closing Balance (Field 62F)
             Field62F field62F = mt.getField62F();
             BigDecimal closingBalance = null;
             if (field62F != null) {
@@ -95,25 +96,13 @@ public class TransactionService {
             }
             transaction.setClosingBalance(closingBalance);
 
-            // Closing Available Balance (Field 64) ----------------------------------
-            Field64 closingAvailableBalance = mt.getField64();
-            if (closingAvailableBalance != null) {
-                transaction.setClosingAvailableBalance(String.valueOf(new BigDecimal(closingAvailableBalance.getAmount().replace(',', '.'))));
-            }
+            // Closing Currency (Field 62F)
+            String closingCurrency = field62F != null ? field62F.getCurrency() : "N/A";
+            transaction.setClosingCurrency(closingCurrency); // Make sure your entity has this field
 
-            // Forward Available Balance (Field 65) ------------------------------
-            List<Field65> forwardAvailableBalances = mt.getField65();
-            List<String> forwardBalances = new ArrayList<>();
-            if (forwardAvailableBalances != null && !forwardAvailableBalances.isEmpty()) {
-                for (Field65 forwardAvailableBalance : forwardAvailableBalances) {
-                    forwardBalances.add(forwardAvailableBalance.getValue());
-                }
-            }
-            transaction.setForwardAvailableBalance(forwardBalances.isEmpty() ? null : String.join(", ", forwardBalances));
-
-            System.out.println(transaction);
             transactions.add(transaction);
         }
+
         transactionRepository.saveAll(transactions);
         return transactions;
     }
@@ -121,26 +110,11 @@ public class TransactionService {
     LocalDate parseYYMMDD(String dateStr) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
         LocalDate date = LocalDate.parse(dateStr, formatter);
-
-        // Assuming the year is within a reasonable range (e.g., within 100 years from now)
         int currentYear = LocalDate.now().getYear();
         int parsedYear = date.getYear();
-
-        // If the parsed year is greater than the current year, assume it's from the previous century
         if (parsedYear > currentYear % 100) {
             date = date.minusYears(100);
         }
-
         return date;
     }
-
-
-
-
-
-
-
-
-
-
 }

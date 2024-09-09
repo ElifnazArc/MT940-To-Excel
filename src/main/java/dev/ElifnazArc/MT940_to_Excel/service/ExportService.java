@@ -15,12 +15,12 @@ public class ExportService {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Transactions");
 
-        // Create header row
+        // Başlıklar
         Row headerRow = sheet.createRow(0);
         String[] columnHeaders = {
                 "ID", "Account Identification", "Bank Code", "Batch ID", "Closing Available Balance", "Closing Balance",
-                "Forward Available Balance", "Opening Balance", "Statement Number", "Transaction Amount",
-                "Transaction Date", "Transaction Details", "Transaction Reference Number", "Transaction Type", "Sender"
+                "Closing Currency", "Forward Available Balance", "Opening Balance", "Opening Currency", "Statement Number",
+                "Transaction Amount", "Transaction Date", "Transaction Details", "Transaction Reference Number", "Transaction Type", "Sender"
         };
 
         for (int i = 0; i < columnHeaders.length; i++) {
@@ -28,14 +28,14 @@ public class ExportService {
             cell.setCellValue(columnHeaders[i]);
         }
 
-        // Add data
+        // Veri ekleme
         int rowNum = 1;
         for (Transaction transaction : transactions) {
             Row row = sheet.createRow(rowNum++);
             mapTransactionToRow(transaction, row);
         }
 
-        // Write the file
+        // Dosya yazma
         try (FileOutputStream outputStream = new FileOutputStream("transactions.xlsx")) {
             workbook.write(outputStream);
             workbook.close();
@@ -54,15 +54,16 @@ public class ExportService {
         row.createCell(3).setCellValue(transaction.getBatchId());
         row.createCell(4).setCellValue(transaction.getClosingAvailableBalance());
         row.createCell(5).setCellValue(transaction.getClosingBalance().doubleValue());
+        row.createCell(15).setCellValue(transaction.getClosingCurrency());
         row.createCell(6).setCellValue(transaction.getForwardAvailableBalance());
         row.createCell(7).setCellValue(transaction.getOpeningBalance().doubleValue());
+        row.createCell(15).setCellValue(transaction.getOpeningCurrency());
         row.createCell(8).setCellValue(transaction.getStatementNumber());
         row.createCell(9).setCellValue(transaction.getTransactionAmount().doubleValue());
         row.createCell(10).setCellValue(transaction.getTransactionDate().toString());
         row.createCell(11).setCellValue(transaction.getTransactionDetails());
         row.createCell(12).setCellValue(transaction.getTransactionReferenceNumber());
-        row.createCell(13).setCellValue(transaction.getTransactionType().toString());
+        row.createCell(13).setCellValue(String.valueOf(transaction.getTransactionType()));
         row.createCell(14).setCellValue(transaction.getSender());
     }
 }
-
