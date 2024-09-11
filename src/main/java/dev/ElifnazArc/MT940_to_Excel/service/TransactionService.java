@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,9 @@ public class TransactionService {
 
             LocalDate transactionDate = parseYYMMDD(field61.getValueDate());
             transaction.setTransactionDate(transactionDate);
+
+            LocalDate actionDate = LocalDate.now();
+            transaction.setActionDate(actionDate);
 
             transaction.setTransactionAmount(new BigDecimal(field61.getAmount().replace(',', '.')));
 

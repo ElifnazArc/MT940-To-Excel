@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 
 @Getter
@@ -20,6 +21,9 @@ public class Transaction {
     @Column(name = "account_identification", nullable = false, length = 50)
     private String accountIdentification;
 
+    @Column(name = "action_date")
+    private LocalDate actionDate;
+
     @Column(name = "bank_code", nullable = false, length = 20)
     private String bankCode;
 
@@ -29,17 +33,11 @@ public class Transaction {
     @Column(name = "closing_balance", nullable = false, precision = 15, scale = 2)
     private BigDecimal closingBalance;
 
-    @Column(name = "closing_currency", nullable = false, length = 10)
-    private String closingCurrency;
-
     @Column(name = "forward_available_balance")
     private String forwardAvailableBalance;
 
     @Column(name = "opening_balance", nullable = false, precision = 15, scale = 2)
     private BigDecimal openingBalance;
-
-    @Column(name = "opening_currency", nullable = false, length = 10)
-    private String openingCurrency;
 
     @Column(name = "statement_number", nullable = false, length = 10)
     private String statementNumber;
@@ -64,5 +62,11 @@ public class Transaction {
 
     @Column(name = "batch_id", nullable = false, length = 50)
     private String batchId;
+
+    @Column(name = "closing_currency", nullable = false, length = 10)
+    private String closingCurrency;
+
+    @Column(name = "opening_currency", nullable = false, length = 10)
+    private String openingCurrency;
 
 }
