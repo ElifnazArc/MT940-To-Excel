@@ -26,6 +26,15 @@ public class MT940ParseService {
             throw new RuntimeException("resource not found");
         }
     }
+    // Dosyayı okuyup satırları bir liste olarak döndürür
+    public List<String> getResourceFileAsString(InputStream is) {
+        if (is != null) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            return reader.lines().toList();
+        } else {
+            throw new RuntimeException("resource not found");
+        }
+    }
 
     // Dosyayı InputStream olarak alır
     private InputStream getResourceFileAsInputStream(String fileName) {
