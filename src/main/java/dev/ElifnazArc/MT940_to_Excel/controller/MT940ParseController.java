@@ -4,6 +4,7 @@ import dev.ElifnazArc.MT940_to_Excel.entity.Transaction;
 import dev.ElifnazArc.MT940_to_Excel.repository.TransactionRepository;
 import dev.ElifnazArc.MT940_to_Excel.service.MT940ParseService;
 import dev.ElifnazArc.MT940_to_Excel.service.TransactionService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api")
 public class MT940ParseController {
@@ -40,14 +41,13 @@ public class MT940ParseController {
     }
 
     @PostMapping("/upload")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file) throws IOException {
-
+    public ResponseEntity<List<Transaction>> handleFileUpload(@RequestParam("file") MultipartFile file) throws IOException {
         InputStream inputStream = file.getInputStream();
         List<String> fileContent = mt940Service.getResourceFileAsInputStream(inputStream);
         List<Transaction> transactions = transactionService.parseMT940ToRead(fileContent);
         transactionRepository.saveAll(transactions);
 
-        return "File uploaded successfully!";
+        return ResponseEntity.ok(transactions);
     }
 
     @GetMapping("/transactions/show")
