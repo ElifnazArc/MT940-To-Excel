@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -16,13 +15,14 @@ import java.util.UUID;
 @Service
 public class TransactionService {
 
+    private LocalDateUtil dateUtil = new LocalDateUtil();
+
     private final TransactionRepository transactionRepository;
 
     public TransactionService(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
     }
 
-    // MT940 dosyasını parse edip bir Map yapısında döndürür
     public List<Transaction> parseMT940ToRead(List<String> fileContent) {
         String msg = String.join("\n", fileContent);
 
@@ -45,7 +45,7 @@ public class TransactionService {
 
             Field61 field61 = field61s.get(i);
 
-            LocalDate transactionDate = parseYYMMDD(field61.getValueDate());
+            LocalDate transactionDate = dateUtil.parseYYMMDD(field61.getValueDate());
             transaction.setTransactionDate(transactionDate);
 
             LocalDate actionDate = LocalDate.now();
@@ -89,7 +89,7 @@ public class TransactionService {
 
             // Opening Currency (Field 60F)
             String openingCurrency = field60F != null ? field60F.getCurrency() : "N/A";
-            transaction.setOpeningCurrency(openingCurrency); // Make sure your entity has this field
+            transaction.setOpeningCurrency(openingCurrency);
 
             // Closing Balance (Field 62F)
             Field62F field62F = mt.getField62F();
@@ -101,24 +101,13 @@ public class TransactionService {
 
             // Closing Currency (Field 62F)
             String closingCurrency = field62F != null ? field62F.getCurrency() : "N/A";
-            transaction.setClosingCurrency(closingCurrency); // Make sure your entity has this field
+            transaction.setClosingCurrency(closingCurrency);
 
             transactions.add(transaction);
         }
 
         transactionRepository.saveAll(transactions);
         return transactions;
-    }
-
-    LocalDate parseYYMMDD(String dateStr) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
-        LocalDate date = LocalDate.parse(dateStr, formatter);
-        int currentYear = LocalDate.now().getYear();
-        int parsedYear = date.getYear();
-        if (parsedYear > currentYear % 100) {
-            date = date.minusYears(100);
-        }
-        return date;
     }
 
 }

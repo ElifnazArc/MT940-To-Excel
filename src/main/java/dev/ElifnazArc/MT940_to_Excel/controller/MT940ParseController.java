@@ -42,11 +42,13 @@ public class MT940ParseController {
 
     @PostMapping("/upload")
     public ResponseEntity<List<Transaction>> handleFileUpload(@RequestParam("file") MultipartFile file) throws IOException {
-        InputStream inputStream = file.getInputStream();
-        List<String> fileContent = mt940Service.getResourceFileAsInputStream(inputStream);
-        List<Transaction> transactions = transactionService.parseMT940ToRead(fileContent);
-        transactionRepository.saveAll(transactions);
+        List<Transaction> transactions;
 
+        try (InputStream inputStream = file.getInputStream()) {
+            List<String> fileContent = mt940Service.getResourceFileAsInputStream(inputStream);
+            transactions = transactionService.parseMT940ToRead(fileContent);
+            transactionRepository.saveAll(transactions);
+        }
         return ResponseEntity.ok(transactions);
     }
 
@@ -54,5 +56,4 @@ public class MT940ParseController {
     public List<Transaction> getAllTransactions() {
         return transactionRepository.findAll();
     }
-
 }

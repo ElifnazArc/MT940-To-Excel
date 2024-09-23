@@ -67,5 +67,4 @@ public class Transaction {
 
     @Column(name = "opening_currency", nullable = false, length = 10)
     private String openingCurrency;
-
 }
